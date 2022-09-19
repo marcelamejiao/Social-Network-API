@@ -35,10 +35,10 @@ module.exports = {
         // Add the thought to the user's thought array
         User.findOneAndUpdate(
           { _id: req.body.userId },
-          { $addToSet: { thoughts: thought._id } }
+          { $addToSet: { thoughts: thought._id } },
+          { runValidators: true, new: true }
         )
-        
-        res.json(thought)
+        .then(() => res.json(thought));
       })
       .catch((err) => res.status(500).json(err));
     },
@@ -98,8 +98,8 @@ module.exports = {
     // Remove a reaction by the reaction's `reactionId` value
     removeReaction(req, res) {
       Thought.findOneAndUpdate(
-        { reactions: req.params.reactionId },
-        { $pull: { reactions: req.params.reactionId } },
+        { _id: req.params.thoughtId },
+        { $pull: { reactions: { reactionId: req.params.reactionId } } },
         { runValidators: true, new: true }
       )
       .then((thought) =>
